@@ -58,6 +58,10 @@ class EngineControllerTest {
 
     @Test
     void testAdjustGear_InvokesGetInstantaneousSpeedThreeTimes() {
+        // Arrange: simulamos un timestamp
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        when(timeMock.getCurrentTime()).thenReturn(timestamp);
+
         // Arrange: simulamos lecturas de velocidad
         when(speedometerMock.getSpeed()).thenReturn(10.0, 20.0, 30.0);
 
@@ -73,7 +77,7 @@ class EngineControllerTest {
         // Arrange: simulamos un timestamp y lecturas de velocidad
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         when(timeMock.getCurrentTime()).thenReturn(timestamp);
-        when(speedometerMock.getSpeed()).thenReturn(10.0, 20.0, 30.0);
+        when(speedometerMock.getSpeed()).thenReturn(10.0, 7.0, 15.0);
 
         // Act: ajustamos la marcha
         engineController.adjustGear();
@@ -81,19 +85,23 @@ class EngineControllerTest {
         // Assert: capturamos el mensaje de log y verificamos que tiene el formato correcto
         ArgumentCaptor<String> logCaptor = ArgumentCaptor.forClass(String.class);
         verify(loggerMock).log(logCaptor.capture());
-        String expectedLog = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp) + " Gear changed to SECOND";
+        String expectedLog = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp) + " Gear changed to FIRST";
         assertEquals(expectedLog, logCaptor.getValue());
     }
 
     @Test
     void testAdjustGear_AssignsCorrectGear() {
+        // Arrange: simulamos un timestamp
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        when(timeMock.getCurrentTime()).thenReturn(timestamp);
+
         // Arrange: simulamos lecturas de velocidad
-        when(speedometerMock.getSpeed()).thenReturn(10.0, 20.0, 30.0);
+        when(speedometerMock.getSpeed()).thenReturn(10.0, 7.0, 15.0);
 
         // Act: ajustamos la marcha
         engineController.adjustGear();
 
         // Assert: verificamos que se invocó setGear con el valor correcto
-        verify(gearboxMock).setGear(GearValues.SECOND);
+        verify(gearboxMock).setGear(GearValues.FIRST);
     }
 }
